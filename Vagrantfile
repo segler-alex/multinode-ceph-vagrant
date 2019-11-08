@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
       config.vm.network :private_network, ip: "172.21.12.#{i+11}"
       config.vm.provider "virtualbox" do |vb|
         unless File.exist?("./secondDisk_#{i}.vdi")
-          vb.customize ['createhd', '--filename', "./secondDisk_#{i}.vdi", '--variant', 'Fixed', '--size', 10 * 1024]
+          vb.customize ['createhd', '--filename', "./secondDisk_#{i}.vdi", '--variant', 'Fixed', '--size', 3 * 1024]
         end
         vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', "./secondDisk_#{i}.vdi"]
       end
