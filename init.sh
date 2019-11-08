@@ -65,3 +65,6 @@ ceph osd pool create cephfs_metadata 8
 ceph fs new cephfs cephfs_metadata cephfs_data
 
 # ceph dashboard ac-user-create administrator password administrator
+# rbd pool setup
+ceph osd pool create rbd 8
+ceph osd pool application enable rbd rbd
