@@ -170,6 +170,10 @@ TODO
 
 TODO
 
+### Ceph Dashboard
+http://ceph-server-1:7000
+Default username and password is `administrator` / `password`.
+
 ## Cleanup
 
 When you're all done, tell Vagrant to destroy the VMs.
