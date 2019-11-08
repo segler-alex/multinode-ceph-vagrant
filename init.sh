@@ -23,6 +23,7 @@ cd test-cluster
 ceph-deploy install --release=${CEPH_RELEASE} ceph-admin ceph-server-1 ceph-server-2 ceph-server-3 ceph-client
 ceph-deploy new ceph-server-1 ceph-server-2 ceph-server-3
 echo "mon_clock_drift_allowed = 1" >> ceph.conf
+echo "rbd default features = 5" >> ceph.conf
 echo "[mon]" >> ceph.conf
 echo "mon_allow_pool_delete = true" >> ceph.conf
 
