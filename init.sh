@@ -37,10 +37,6 @@ ceph-deploy mgr create ceph-server-1
 ceph-deploy rgw create ceph-server-1
 ceph-deploy mds create ceph-server-1
 
-# ceph modules
-ceph mgr module enable dashboard
-ceph dashboard create-self-signed-cert
-
 # keyrings
 chmod +r /etc/ceph/ceph.client.admin.keyring
 ssh ceph-server-1 sudo chmod +r /etc/ceph/ceph.client.admin.keyring
@@ -52,19 +48,34 @@ ceph-deploy osd create --bluestore --data /dev/sdc ceph-server-1
 ceph-deploy osd create --bluestore --data /dev/sdc ceph-server-2
 ceph-deploy osd create --bluestore --data /dev/sdc ceph-server-3
 
-# rgw binding to dashboard
-ADMIN_USER=$(radosgw-admin user create --uid=admin --display-name=admin --system)
-ACCESS_KEY=$(echo $ADMIN_USER | jq ".keys[0].access_key")
-SECRET_KEY=$(echo $ADMIN_USER | jq ".keys[0].secret_key")
-ceph dashboard set-rgw-api-access-key $ACCESS_KEY
-ceph dashboard set-rgw-api-secret-key $SECRET_KEY
-
 # ceph fs setup
 ceph osd pool create cephfs_data 8
 ceph osd pool create cephfs_metadata 8
 ceph fs new cephfs cephfs_metadata cephfs_data
 
-# ceph dashboard ac-user-create administrator password administrator
 # rbd pool setup
 ceph osd pool create rbd 8
 ceph osd pool application enable rbd rbd
+
+# ceph dashboard
+ceph mgr module enable dashboard
+ceph dashboard create-self-signed-cert
+ceph config set mgr mgr/dashboard/ssl false
+ceph config set mgr mgr/dashboard/server_port 7000
+ceph config set mgr mgr/dashboard/ssl_server_port 8443
+
+# create rgw user
+radosgw-admin user create --uid=system --display-name=system --system
+ACCESS_KEY=$(radosgw-admin user info --uid=system | jq -r '.keys[0].access_key')
+SECRET_KEY=$(radosgw-admin user info --uid=system | jq -r '.keys[0].secret_key')
+
+# set rgw accesskey/secret to dashboard
+ceph dashboard set-rgw-api-access-key $ACCESS_KEY
+ceph dashboard set-rgw-api-secret-key $SECRET_KEY
+
+# create dashboard admin user
+ceph dashboard ac-user-create administrator password administrator
+
+# restart dashboard
+ceph mgr module disable dashboard
+ceph mgr module enable dashboard
